@@ -12,19 +12,19 @@ resource "aws_route53_zone" "primary" {
 }
 
 module "cluster-us-east-1" {
-  source             = "../service"
+  source             = "../modules/service"
   region             = "us-east-1"
   availability_zones = ["us-east-1a", "us-east-1b"]
 }
 
 module "cluster-us-west-1" {
-  source             = "../service"
+  source             = "../modules/service"
   region             = "us-west-1"
   availability_zones = ["us-west-1b", "us-west-1c"]
 }
 
 module "dns-us-east-1" {
-  source             = "../dns"
+  source             = "../modules/dns"
   subdomain          = "dev"
 
   # this doesn't matter since route53 is global
