@@ -9,6 +9,11 @@ variable region {
   description = "AWS region"
 }
 
+variable subdomain {
+  type        = string
+  description = "Subdomain for our cluster"
+}
+
 variable deployment_maximum_percent {
   type        = number
   default     = 200

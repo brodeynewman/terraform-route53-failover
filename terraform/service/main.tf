@@ -134,6 +134,7 @@ module "ecr" {
   source                 = "git::https://github.com/cloudposse/terraform-aws-ecr.git?ref=master"
   namespace              = module.label.namespace
   name                   = module.label.name
+  image_tag_mutability   = "MUTABLE"
   principals_full_access = [data.aws_iam_role.ecr.arn]
 }
 
@@ -307,17 +308,25 @@ resource "aws_ecs_service" "node" {
 }
 
 resource "aws_route53_zone" "primary" {
-  name = "everlooksoftware.com"
+  name = "${var.subdomain}.everlooksoftware.com"
 }
 
+# You'll take the NS output of this record and apply it to your 'centralized'...
+# AWS account. In this setup, we have 1 aws account per env with an 'ops' account that...
+# holds our 'shared' resources (like our DNS configuration). This is the only 'outlier' step.
 resource "aws_route53_record" "primary" {
-  zone_id = aws_route53_zone.primary.zone_id
-  name    = "forge"
-  type    = "A"
+  zone_id        = aws_route53_zone.primary.zone_id
+  name           = ""
+  type           = "A"
+  set_identifier = "${var.subdomain}-primary"
 
   alias {
     name                   = aws_lb.alb.dns_name
     zone_id                = aws_lb.alb.zone_id
     evaluate_target_health = true
+  }
+
+  failover_routing_policy {
+    type = "PRIMARY"
   }
 }
