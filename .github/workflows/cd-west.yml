@@ -24,32 +24,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
           aws-region: us-west-1
 
-      # Sets the directory we'll be running terraform in based on the branch we choose
-      - name: Set terraform directory
-        id: setvars
-        run: |
-          if [[ "${{github.base_ref}}" == "main" || "${{github.ref}}" == "refs/heads/master" ]]; then
-            echo "::set-output name=TF_DIR::prod"
-          fi
-
-          if [[ "${{github.base_ref}}" == "develop" || "${{github.ref}}" == "refs/heads/develop" ]]; then
-            echo "::set-output name=TF_DIR::dev"
-          fi
-
-      # Sets up terraform for our runner
-      - uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 0.14.3
-
-      - name: Terraform init
-        run: terraform -chdir=./terraform/${{steps.setvars.outputs.TF_DIR}} init
-
-      - name: Terraform plan
-        run: terraform -chdir=./terraform/${{steps.setvars.outputs.TF_DIR}} plan
-
-      - name: Terraform apply
-        run: terraform -chdir=./terraform/${{steps.setvars.outputs.TF_DIR}} apply -auto-approve
-
       - name: npm install
         run: npm i
 
