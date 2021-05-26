@@ -2,7 +2,7 @@ name: ECS deployment
 
 on:
   push:
-    branches: [develop] # the branch we want this to run on
+    branches: [develop, master] # the branch we want this to run on
 
 jobs:
   build_east:
