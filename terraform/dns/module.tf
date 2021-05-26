@@ -35,3 +35,16 @@ resource "aws_route53_record" "secondary" {
     type = "SECONDARY"
   }
 }
+
+resource "aws_route53_health_check" "primary" {
+  fqdn              = "${var.subdomain}.everlooksoftware.com"
+  port              = 80
+  type              = "HTTP"
+  resource_path     = "/"
+  failure_threshold = "1"
+  request_interval  = "10"
+
+  tags = {
+    Name = "failover-healthcheck"
+  }
+}

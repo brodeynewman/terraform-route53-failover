@@ -5,7 +5,7 @@ on:
     branches: [develop] # the branch we want this to run on
 
 jobs:
-  build:
+  build_east:
     runs-on: ubuntu-latest
 
     steps:
