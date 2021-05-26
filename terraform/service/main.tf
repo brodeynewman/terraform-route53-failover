@@ -86,46 +86,46 @@ resource "aws_eip" "nat1" {
 }
 
 resource "aws_subnet" "private_az1" {
-  availability_zone       = "${var.region}a"
+  availability_zone       = var.availability_zones[0]
   map_public_ip_on_launch = true
   cidr_block              = "10.10.10.0/24"
   vpc_id                  = aws_vpc.main.id
 
   tags = {
-    Name = "Private subnet for ${var.region}a"
+    Name = "Private subnet for ${var.availability_zones[0]}"
   }
 }
 
 resource "aws_subnet" "private_az2" {
-  availability_zone       = "${var.region}b"
+  availability_zone       = var.availability_zones[1]
   map_public_ip_on_launch = true
   cidr_block              = "10.10.20.0/24"
   vpc_id                  = aws_vpc.main.id
 
   tags = {
-    Name = "Private subnet for ${var.region}b"
+    Name = "Private subnet for ${var.availability_zones[1]}"
   }
 }
 
 resource "aws_subnet" "public_az1" {
-  availability_zone       = "${var.region}a"
+  availability_zone       = var.availability_zones[0]
   map_public_ip_on_launch = true
   cidr_block              = "10.10.30.0/24"
   vpc_id                  = aws_vpc.main.id
 
   tags = {
-    Name = "Public subnet for ${var.region}a"
+    Name = "Public subnet for ${var.availability_zones[0]}"
   }
 }
 
 resource "aws_subnet" "public_az2" {
-  availability_zone       = "${var.region}b"
+  availability_zone       = var.availability_zones[1]
   map_public_ip_on_launch = true
   cidr_block              = "10.10.40.0/24"
   vpc_id                  = aws_vpc.main.id
 
   tags = {
-    Name = "Public subnet for ${var.region}b"
+    Name = "Public subnet for ${var.availability_zones[1]}"
   }
 }
 
@@ -134,6 +134,7 @@ module "ecr" {
   source                 = "git::https://github.com/cloudposse/terraform-aws-ecr.git?ref=master"
   namespace              = module.label.namespace
   name                   = module.label.name
+  image_tag_mutability   = "MUTABLE"
   principals_full_access = [data.aws_iam_role.ecr.arn]
 }
 
@@ -303,21 +304,5 @@ resource "aws_ecs_service" "node" {
 
     subnets          = [aws_subnet.private_az1.id, aws_subnet.private_az2.id]
     security_groups  = [aws_security_group.ecs_service.id]
-  }
-}
-
-resource "aws_route53_zone" "primary" {
-  name = "everlooksoftware.com"
-}
-
-resource "aws_route53_record" "primary" {
-  zone_id = aws_route53_zone.primary.zone_id
-  name    = "forge"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.alb.dns_name
-    zone_id                = aws_lb.alb.zone_id
-    evaluate_target_health = true
   }
 }

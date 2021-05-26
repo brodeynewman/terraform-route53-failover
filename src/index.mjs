@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 app.get("/", (req, res) => {
   log("Incoming request:", req.path);
 
-  res.json({ success: true });
+  res.json({ success: true, deploy: "latest" });
 });
 
 app.listen(PORT, () => {

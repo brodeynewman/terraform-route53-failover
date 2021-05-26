@@ -44,3 +44,8 @@ variable task_memory {
   default     = 512
   description = "The amount of memory (in MiB) used by the task. If using Fargate launch type `task_memory` must match supported cpu value (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#task_size)"
 }
+
+variable availability_zones {
+  type        = list
+  description = "List of availability zones"
+}
