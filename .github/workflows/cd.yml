@@ -42,4 +42,4 @@ jobs:
 
       - name: Update ECS cluster
         run: |
-          aws ecs update-service --cluster everlook-forge-public --service node-ecs --force-new-deployment
+          aws ecs update-service --cluster everlook-forge-public --service forge --force-new-deployment
