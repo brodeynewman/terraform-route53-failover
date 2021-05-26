@@ -86,46 +86,46 @@ resource "aws_eip" "nat1" {
 }
 
 resource "aws_subnet" "private_az1" {
-  availability_zone       = "${var.region}a"
+  availability_zone       = var.availability_zones[0]
   map_public_ip_on_launch = true
   cidr_block              = "10.10.10.0/24"
   vpc_id                  = aws_vpc.main.id
 
   tags = {
-    Name = "Private subnet for ${var.region}a"
+    Name = "Private subnet for ${var.availability_zones[0]}"
   }
 }
 
 resource "aws_subnet" "private_az2" {
-  availability_zone       = "${var.region}b"
+  availability_zone       = var.availability_zones[1]
   map_public_ip_on_launch = true
   cidr_block              = "10.10.20.0/24"
   vpc_id                  = aws_vpc.main.id
 
   tags = {
-    Name = "Private subnet for ${var.region}b"
+    Name = "Private subnet for ${var.availability_zones[1]}"
   }
 }
 
 resource "aws_subnet" "public_az1" {
-  availability_zone       = "${var.region}a"
+  availability_zone       = var.availability_zones[0]
   map_public_ip_on_launch = true
   cidr_block              = "10.10.30.0/24"
   vpc_id                  = aws_vpc.main.id
 
   tags = {
-    Name = "Public subnet for ${var.region}a"
+    Name = "Public subnet for ${var.availability_zones[0]}"
   }
 }
 
 resource "aws_subnet" "public_az2" {
-  availability_zone       = "${var.region}b"
+  availability_zone       = var.availability_zones[1]
   map_public_ip_on_launch = true
   cidr_block              = "10.10.40.0/24"
   vpc_id                  = aws_vpc.main.id
 
   tags = {
-    Name = "Public subnet for ${var.region}b"
+    Name = "Public subnet for ${var.availability_zones[1]}"
   }
 }
 
@@ -304,29 +304,5 @@ resource "aws_ecs_service" "node" {
 
     subnets          = [aws_subnet.private_az1.id, aws_subnet.private_az2.id]
     security_groups  = [aws_security_group.ecs_service.id]
-  }
-}
-
-resource "aws_route53_zone" "primary" {
-  name = "${var.subdomain}.everlooksoftware.com"
-}
-
-# You'll take the NS output of this record and apply it to your 'centralized'...
-# AWS account. In this setup, we have 1 aws account per env with an 'ops' account that...
-# holds our 'shared' resources (like our DNS configuration). This is the only 'outlier' step.
-resource "aws_route53_record" "primary" {
-  zone_id        = aws_route53_zone.primary.zone_id
-  name           = ""
-  type           = "A"
-  set_identifier = "${var.subdomain}-primary"
-
-  alias {
-    name                   = aws_lb.alb.dns_name
-    zone_id                = aws_lb.alb.zone_id
-    evaluate_target_health = true
-  }
-
-  failover_routing_policy {
-    type = "PRIMARY"
   }
 }
