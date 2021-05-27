@@ -4,6 +4,18 @@ Active-passive failover is a failover configuration where one group of resources
 
 The reason this is so powerful is that it helps guaruntees general availability for a system.
 
+## Architecture overview
+
+![img](./failover.png)
+
+A few things are happening here.
+
+1. Route 53 routes requests from our domain (dev.everlooksoftware.com) to our ALB in our primary region (us-east-1).
+2. If requests fail, Route 53 directs traffic to our ALB in our secondary region (us-west-1).
+3. Our ECS service (NodeJS API running on Docker) sits protected behind 2 private subnets in 2 separate AZ's.
+   - This API is only exposed via our ALB which lives in two public subnets in 2 separate AZ's.
+   - Each service has internet access via Nat Gateway configuration (which has public subnet access).
+
 ## Active-passive failover
 
 We'll be using Route 53 DNS records to point our domain name to an application load balancer within our primary region (`us-east-1`).
@@ -83,15 +95,3 @@ Here's what it will look like:
 ![img](./domain.png)
 
 You should have one NS record in the managmement account per subdomain.
-
-## Architecture overview
-
-![img](./failover.png)
-
-A few things are happening here.
-
-1. Route 53 routes requests from our domain (dev.everlooksoftware.com) to our ALB in our primary region (us-east-1).
-2. If requests fail, Route 53 directs traffic to our ALB in our secondary region (us-west-1).
-3. Our ECS service (NodeJS API running on Docker) sits protected behind 2 private subnets in 2 separate AZ's.
-   - This API is only exposed via our ALB which lives in two public subnets in 2 separate AZ's.
-   - Each service has internet access via Nat Gateway configuration (which has public subnet access).
