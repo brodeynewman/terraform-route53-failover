@@ -11,19 +11,23 @@ resource "aws_route53_zone" "primary" {
   name = "dev.everlooksoftware.com"
 }
 
+# Clone this if you want to add more environments.
+# Swap out the region + AZ's.
 module "cluster-us-east-1" {
   source             = "../modules/service"
   region             = "us-east-1"
   availability_zones = ["us-east-1a", "us-east-1b"]
 }
 
+# Clone this if you want to add more environments.
+# Swap out the region + AZ's.
 module "cluster-us-west-1" {
   source             = "../modules/service"
   region             = "us-west-1"
   availability_zones = ["us-west-1b", "us-west-1c"]
 }
 
-module "dns-us-east-1" {
+module "dns" {
   source             = "../modules/dns"
   subdomain          = "dev"
 
